@@ -49,7 +49,7 @@ $$
 $$
 
 $$
-\\P(y_i=1)
+P(y_i=1)
 $$
 
 <u>Learning Model</u>
