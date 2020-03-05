@@ -430,7 +430,196 @@ Within one back and forth, the system can calculate and update $x_i^{(l)}$and $\
 
 
 
-Notice: When $W$ is too large (positive or negative), 
+Notice: When $W$ is too large (positive or negative), $s$ becomes large in absolute value and the gradient term approaches zero. Therefore, it is best to initialize the algorithm with small weights so that the algorithm has flexibility to move the weights around easily to fit the data. But $w_{ij}^{(l)}$  shouldn't be $\underline{0}$ , otherwise all $\delta^{(l-1)}$ will become zero. One good choice is to initialize choosing Gaussian random weights.
+
+###### Stopping Criteria
+
+<u>Solution:</u> A combination of stopping criteria:
+
+$\bullet$ 		There is marginal error improvement
+
+$\bullet$ 		Error is small
+
+$\bullet$ 		An upper bound on the number of iterations
+
+
+
+Example:
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305140526490.png" alt="image-20200305140526490" style="zoom:60%;" />
+
+Remarks:
+
+Both Neural Networks and Non-Linear Transformations can conduct non-linear operations, there are subtle differences. Non-Linear features are fixed before we see the data; neural networks can be tuned after seeing the data, which has more flexibility.
+
+
+
+
+
+### Overfitting
+
+The following figure shows the $E_{in}$ and $E_{out}$ change as $|\cal{H}|$ increases.     
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305141348045.png" alt="image-20200305141348045" style="zoom: 67%;" />
+
+<u>Definition:</u> Fitting the data more than it is warranted and fitting the noise. 
+
+This requires us match the data sources, rather than the target complexity.
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305142715232.png" alt="image-20200305142715232" style="zoom:50%;" />
+
+The factors that influence "Overfitting"
+
+$\bullet$ 		Noise Leverl  $\sigma^2$
+
+$\bullet$ 		Target complexity  $Q_f$
+
+$\bullet$ 		Dataset size  $N$ 
+
+
+
+In the following case, we compute the overfit measure $E_{out}(g10)-E_{out}(g2)$  
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305143458182.png" alt="image-20200305143458182" style="zoom:60%;" />
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305143616052.png" alt="image-20200305143616052" style="zoom:60%;" />
+
+Definition of Deterministic Noise:
+
+The part of $f$ that $\cal{H}$ cannot capture:  $f(X)-g(X)$ . It depends on $\cal{H}$ and fixed for a five $X$ . It reflects the difference that intrinsic from the target function. In other words, the deterministic noise is **<u>Bias</u>**.
+
+
+
+### Regularization
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305145549997.png" alt="image-20200305145549997" style="zoom:50%;" />
+
+With regularization, there is restriction on $\cal{H}$ , $|\cal{H}|\downarrow$ , the bais $\uparrow$ , restraining the model between "linear" and "constant" models.
+
+##### The Polynomial Model
+
+Given feature $X$ , to transform $x$ using polynomials with Legendre polynomials.
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305152054740.png" alt="image-20200305152054740" style="zoom:50%;" />
+
+##### Constraining the Weights
+
+Hard constraint:
+
+​			$\cal{H}_\rm2$ is constrained version of $\cal{H}_\rm10$ with $w_q=0$ for all $q>2$ 
+
+Softer constraint:
+
+​			$\sum_{q-0}^{Q}w_q^2\leq C$ 		"soft-oerder" constraint
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305152758893.png" alt="image-20200305152758893" style="zoom:50%;" />
+
+Original Optimization:
+
+​			Minimize:		$\frac{1}{N}(ZW-Y)^T(ZW-Y)$
+
+​			Subject to:		$W^TW\leq C$ 
+
+​			$\Rightarrow$ 					  $W_{lin}=(Z^TZ)^{-1}Z^TY$   
+
+
+
+Regularized Optimization:
+
+​			Minimize:		 $\frac{1}{N}(ZW-Y)^T(ZW-Y)+\frac{\lambda}{N}W^TW$ ,  $\lambda >0$
+
+​			$\Rightarrow$ 					  $W_{reg}=W_{lin}=(Z^TZ+\lambda I)^{-1}Z^TY$
+
+##### Weight Decay
+
+$$
+W(t+1)=W(t)-\eta \Delta E_{in}(W(t))-2\eta \frac{\lambda}{N}W(t)\\
+=W(t)(1-2\eta \frac{\lambda}{N})-\eta \Delta E_{in}(W(t))
+$$
+
+The weight "decays" before moving in the opppsite direction of the gradient.
+
+##### Weight Growth
+
+We can also constrain the weight to be large:
+$$
+C\leq \sum_{q=0}^Q\gamma_q w_q^2
+$$
+
+
+Tips: <u>**Given a prior probability in Gaussian Distribution is equivalent to adding a $L^2_p$ regularizer.**</u> 
+
+
+
+###### Variations of Weight Decay
+
+$$
+\sum_{q=0}^Q\gamma_q w_q^2
+$$
+
+$\gamma$ : Importance factor
+
+Two extreme examples: 
+
+​				$\gamma=2^q\rightarrow$ Loerw order fit
+
+​				$\gamma=2^{-q}\rightarrow$ Higher order fit
+
+<img src="/Users/Zhang/Library/Application Support/typora-user-images/image-20200305155846030.png" alt="image-20200305155846030" style="zoom:50%;" />
+
+Smaller weights corresponds to smoother hypothesis, and that is why weight decay is a good regularizer. By using weight decay regularizer, we can take the value of weights into the consideration of minimization.
+
+
+
+
+
+##### Augmented Error
+
+Recall for VC-Analysis:
+$$
+E_{out}(h)\leq E_{in}(h)+\Omega(\cal{H})
+$$
+Here, we minimize:
+$$
+E_{aug}(h)\leq E_{in}(h)+\frac{\lambda}{N}\Omega(h)
+$$
+which means we are constraining the upper bound of VC-Inequality.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
