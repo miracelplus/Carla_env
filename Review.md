@@ -144,7 +144,7 @@ It is a verification of hypothesis set $h$ if it is feasible given $N$ data and 
 We can move even further, since we know for a hypothesis set $h$, suppose it contains $M$ hypothesis, then for our final hypothesis $g$ , by using union bound, 
 $$
 P(|E_{in}(g)-E_{out}(g)|\geq\epsilon)\leq \sum_{i=1}^{M}P(|E_{in}(h_i)-E_{out}(h_i)|\geq\epsilon)\\
-\qquad =2Me^{-2\epsilon^2N}
+=2Me^{-2\epsilon^2N}
 $$
 
 $$
