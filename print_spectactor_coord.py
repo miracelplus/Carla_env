@@ -9,7 +9,7 @@
 import glob
 import os
 import sys
-
+import math
 try:
     sys.path.append(glob.glob('../carla/dist/carla-*%d.%d-%s.egg' % (
         sys.version_info.major,
@@ -23,7 +23,10 @@ import carla
 import random
 import time
 import numpy as np
-
+def get_transform(vehicle_location, angle, d=6.4):
+    a = math.radians(angle)
+    location = carla.Location(d * math.cos(a), d * math.sin(a), 2.0) + vehicle_location
+    return carla.Transform(location, carla.Rotation(yaw=180 + angle, pitch=-15))
 
 # define the actor list, containing vehivle, camera, sensor
 actor_list = []
@@ -44,10 +47,15 @@ try:
     bp3 = blueprint_library.filter('model1')[0]
     print(bp3)'''
 
+    spectator = world.get_spectator()
     # spawn_point = random.choice(world.get_map().get_spawn_points()) # type: transform
-    spawn_point = carla.Transform(carla.Location(x=20,y=200), carla.Rotation(yaw=90))
+    spawn_point = carla.Transform(random.choice(world.get_map().get_spawn_points()).location, carla.Rotation(yaw=90))
 
     vehicle = world.spawn_actor(bp, spawn_point) # type: carla.Actor
+    camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
+    camera_transform = carla.Transform(carla.Location(x=10, z=10))    
+    camera = world.spawn_actor(camera_bp, camera_transform, attach_to=vehicle)
+    spectator.set_transform(camera.get_transform())
     # go forward
     vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0))
     # sleep for 3 seconds, then finish:
@@ -61,7 +69,7 @@ try:
     actor_list.append(vehicle)
 
     # sleep for 10 seconds, then finish:
-    time.sleep(10)
+    time.sleep(30)
 
 finally:
 

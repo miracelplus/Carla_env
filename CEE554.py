@@ -24,6 +24,30 @@ import random
 import time
 import numpy as np
 
+# receive the velocity and receive acc 
+def action(vehicle,acc,angle_old,angle_new,deltat):
+    # angle_loc is the angle change in transform, angle_global is the angle in world
+    # obtain the vel info of actor
+    current_vel = vehicle.get_velocity()
+    # the coming angular velocity in deltat
+    angle_vel = (angle_new-angle_old)/deltat
+    indicator = np.sign(acc)
+    change_vel_x = indicator*acc*np.cos(angle_new)*deltat
+    change_vel_y = indicator*acc*np.sin(angle_new)*deltat
+    change_vel_z = acc*0
+
+    change_vel = carla.Vector3D(change_vel_x,change_vel_y,change_vel_z)
+    new_ang_vel = carla.Vector3D(0,0,angle_vel)
+    new_vel = current_vel + change_vel
+    vehicle.set_angular_velocity(new_ang_vel)
+    vehicle.set_velocity(new_vel)
+
+def vehicle_info(vehicle):
+    current_vel = vehicle.get_velocity()
+    current_acc = vehicle.get_acceleration()
+    
+    return current_vel, current_acc
+
 
 # define the actor list, containing vehivle, camera, sensor
 actor_list = []
@@ -37,25 +61,42 @@ try:
 
     bp = blueprint_library.filter('model3')[0]
     print(bp)
-    '''bp2 = blueprint_library.filter('model3')[0]
-    print(bp2)
-    bp3 = blueprint_library.filter('model3')[0]
-    print(bp3)'''
+
+    deltat = 0.1
 
     # spawn_point = random.choice(world.get_map().get_spawn_points()) # type: transform
     spawn_point = carla.Transform(carla.Location(4440,700,50),carla.Rotation(0,0,0))
-
-    vehicle = world.spawn_actor(bp, spawn_point) # type: carla.Actor
-    vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0))
-    # sleep for 3 seconds, then finish:
-    time.sleep(5)
-    vehicle.apply_control(carla.VehicleControl(hand_brake=True))
-    vehicle.apply_control(carla.VehicleControl(hand_brake=False))
-    vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0,reverse=True))
+    x=79.8
+    y=40
+    z=0
+    new_point = carla.Location(79.8, 40, 0.0)
+    # generate the vehicle actor
+    vehicle = world.spawn_actor(bp, spawn_point)
+    vehicle.set_location(new_point)
     actor_list.append(vehicle)
 
+    ##########################################################
+    deltat=0.1
+    action(vehicle,5,90,-90,deltat)
+
+    time.sleep(deltat)
+
+    ##########################################################
+    '''for i in range(3000):
+        x=x+0.3
+        new_point = carla.Location(x,y,z)
+        vehicle.set_location(new_point)
+        time.sleep(0.01)'''
+    # vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0))
+    # # sleep for 3 seconds, then finish:
+    # time.sleep(5)
+    # vehicle.apply_control(carla.VehicleControl(hand_brake=True))
+    # vehicle.apply_control(carla.VehicleControl(hand_brake=False))
+    # vehicle.apply_control(carla.VehicleControl(throttle=1.0, steer=0.0,reverse=True))
+    
+
     # sleep for 10 seconds, then finish:
-    time.sleep(10)
+    #time.sleep(1)
 
 finally:
 
